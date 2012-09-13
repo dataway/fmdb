@@ -24,6 +24,7 @@
 - (void)close;
 
 - (void)inDatabase:(void (^)(FMDatabase *db))block;
+- (void)asyncInDatabase:(void (^)(FMDatabase *db))block;
 
 - (void)inTransaction:(void (^)(FMDatabase *db, BOOL *rollback))block;
 - (void)inDeferredTransaction:(void (^)(FMDatabase *db, BOOL *rollback))block;

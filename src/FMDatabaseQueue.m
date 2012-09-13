@@ -108,6 +108,22 @@
     FMDBRelease(self);
 }
 
+- (void)asyncInDatabase:(void (^)(FMDatabase *db))block {
+    FMDBRetain(self);
+
+    dispatch_async(_queue, ^() {
+
+        FMDatabase *db = [self database];
+        block(db);
+
+        if ([db hasOpenResultSets]) {
+            NSLog(@"Warning: there is at least one open result set around after performing [FMDatabaseQueue asyncInDatabase:]");
+        }
+        
+        FMDBRelease(self);
+    });
+}
+
 
 - (void)beginTransaction:(BOOL)useDeferred withBlock:(void (^)(FMDatabase *db, BOOL *rollback))block {
     FMDBRetain(self);
