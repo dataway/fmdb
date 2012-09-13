@@ -232,8 +232,6 @@
         return [n intValue];
     }
     
-    NSLog(@"Warning: I could not find the column named '%@'.", columnName);
-    
     return -1;
 }
 
@@ -312,11 +310,17 @@
 }
 
 - (NSDate*)dateForColumnIndex:(int)columnIdx {
-    
-    if (sqlite3_column_type([_statement statement], columnIdx) == SQLITE_NULL || (columnIdx < 0)) {
-        return nil;
+    static NSDateFormatter *dateFormatter = nil;
+    if (dateFormatter == nil) {
+        dateFormatter = [[NSDateFormatter alloc] init];
+        [dateFormatter setDateFormat:@"YYYY-MM-dd HH:mm:ss.SSSSSS"];
     }
-    
+    if (columnIdx < 0)
+        return nil;
+    if (sqlite3_column_type([_statement statement], columnIdx) == SQLITE_NULL)
+        return nil;
+    if (sqlite3_column_type([_statement statement], columnIdx) == SQLITE_TEXT)
+        return [dateFormatter dateFromString:[self stringForColumnIndex:columnIdx]];
     return [NSDate dateWithTimeIntervalSince1970:[self doubleForColumnIndex:columnIdx]];
 }
 
